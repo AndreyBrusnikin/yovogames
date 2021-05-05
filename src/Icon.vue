@@ -7,7 +7,7 @@
         name: "Icon",
         props: {
             id: {required: true},
-            file: {default: process.env.BASE_URL+BASE_PATH+ "css/sprites.svg"}
+            file: {default: "css/sprites.svg"}
         },
         mounted() {
         }

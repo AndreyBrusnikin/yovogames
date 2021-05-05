@@ -2,6 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import Icon from "./Icon.vue"
+
+Vue.component("Icon", Icon);
 
 Vue.config.productionTip = false
 let API_HOST = "https://testapi.yovogames.com/";
