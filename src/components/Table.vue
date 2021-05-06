@@ -22,10 +22,10 @@
                             select(v-model="table[index].Loot[i].ID")
                                 option(:value="opt.ID" v-for="opt in loot") {{opt.Name}}
                     .table-col
-                        .sub-row(v-for="(itemloot, i) in table[index].Loot")
-                            div {{subIdLoad(itemloot.SubID)}}
-                            <!--select(v-model="table[index].Loot[i].SubID")-->
-                            <!--option(:value="opt.ID" v-for="opt in subIdLoad(itemloot.SubID)") {{opt}}-->
+                        .sub-row(v-for="(itemloot, i) in table[index].Loot" )
+                            select(v-model="itemloot.SubID" v-if="itemloot.ID == opt.id" v-for="opt in subId")
+                                option(:value="subOpt.ID"  v-for="subOpt in opt.data") {{subOpt.Name}}
+
                     .table-col
                         .sub-row(v-for="(loot, lootInd) in table[index].Loot")
                             input(v-model="table[index].Loot[lootInd].Count" type="number")
@@ -48,12 +48,13 @@
             subId: [],
             tableToShow: 5,
             totalTable: 0,
-            loading: false
+            loading: ''
         }),
+
         created() {
             this.tableLoad();
             this.lootLoad();
-            console.log(this.subIdLoad(0));
+
         },
         methods: {
             removeTable(index, i) {
@@ -63,41 +64,35 @@
                 this.table[i].Loot.push({Count:0,ID:0,SubID:0})
             },
             save() {
-                var data;
+                let data;
                 data = {Key: this.Key,Data: this.table};
-                fetch(this.API_HOST + 'test/table_add', {
+                return fetch(this.API_HOST + 'test/table_add', {
                     method: 'post',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data),
                 }).then(response => response.json())
                     .then(json => {
+                        console.log(json);
                     })
                     .catch(function (err) {
                         console.log(err);
                     });
             },
             subIdLoad(id) {
-                // var data;
-                // data = {Key: this.Key};
-                // return fetch(this.API_HOST + 'test/loot?subid='+id, {
-                //     method: 'post',
-                //     headers: {'Content-Type': 'application/json'},
-                //     body: JSON.stringify(data),
-                // })
-                //     .then((response) => {
-                //         return response.json();
-                //
-                //     })
-                //     .then((json) => {
-                //
-                //         console.log(json.Data);
-                //         return json.Data
-                //
-                //
-                //     });
+                let data;
+                data = {Key: this.Key};
+                fetch(this.API_HOST + 'test/loot?subid='+id, {
+                    method: 'post',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data),
+                })
+                    .then(response => response.json())
+                    .then(json => {
+                        this.subId.push({id:id, data: json.Data})
+                    })
             },
             tableLoad() {
-                var data;
+                let data;
                 data = {Key: this.Key};
                 fetch(this.API_HOST + 'test/table', {
                     method: 'post',
@@ -122,6 +117,9 @@
                 }).then(response => response.json())
                     .then(json => {
                         this.loot = json.Data
+                        for(let i =0; i<this.loot.length; i++){
+                            this.subIdLoad(this.loot[i].ID)
+                        }
                     })
                     .catch(function (err) {
                         console.log(err);
